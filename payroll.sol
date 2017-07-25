@@ -3,27 +3,53 @@ pragma solidity ^0.4.13;
 contract Payroll {
     uint constant payDuration = 10 seconds;
 
+    struct Employee {
+        address id;
+        uint salary;
+        uint lastPaidDay;
+    }
+
     address owner;
-    address employee;
-    uint salary;
-    uint lastPaidDay;
+    Employee[] employees;
 
     function Payroll() {
         owner = msg.sender;
     }
+    
+    function findEmployee(address employeeId) private returns (Employee storage) {
+        for (uint index = 0; index < employees.length; index++) {
+            Employee storage employee = employees[index];
+            if (employee.id == employeeId) {
+                return employee;
+            }
+        }  
+    }
+    
+    function checkEmployee(address employeeId) returns (uint salary, uint lastPaidDay) {
+        Employee storage employee = findEmployee(employeeId);
+        salary = employee.salary;
+        lastPaidDay = employee.lastPaidDay;
+    }
 
-    function updateEmployee(address newEmployee, uint newSalary) {
+    function updateEmployee(address employeeId, uint salary) {
         require(msg.sender == owner);
+        Employee storage employee = findEmployee(employeeId);
         
-        if (employee != 0x0) {
-            uint payment = salary * (now - lastPaidDay) / payDuration;
+        if (employee.salary == 0) {
+            addEmployee(employeeId, salary);
+        } else {
+            uint payment = employee.salary *
+                (now - employee.lastPaidDay) / payDuration;
             assert(payment <= this.balance);
-            employee.transfer(payment);
+            employee.id.transfer(payment);
+            employee.salary = salary;
+            employee.lastPaidDay = now;
+       
         }
-
-        employee = newEmployee;
-        salary = newSalary * 1 ether;
-        lastPaidDay = now;
+    }
+    
+    function addEmployee(address employeeId, uint salary) {
+        employees.push(Employee(employeeId, salary, now));
     }
 
     function addFund() payable returns (uint) {
@@ -32,8 +58,8 @@ contract Payroll {
     }
 
     function calculateRunWay() returns (uint) {
-        assert(salary > 0);
-        return this.balance / salary;
+        // assert(salary > 0);
+        // return this.balance / salary;
     }
 
     function hasEnoughFund() returns (bool) {
@@ -41,11 +67,11 @@ contract Payroll {
     }
 
     function getPaid() {
-        require(employee == msg.sender);
+        // require(employee == msg.sender);
         
-        uint nextPayDay = lastPaidDay + payDuration;
-        assert(now > nextPayDay);
-        employee.transfer(salary);
-        lastPaidDay = nextPayDay;
+        // uint nextPayDay = lastPaidDay + payDuration;
+        // assert(now > nextPayDay);
+        // employee.transfer(salary);
+        // lastPaidDay = nextPayDay;
     }
 }
