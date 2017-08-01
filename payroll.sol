@@ -10,61 +10,51 @@ contract Payroll {
     }
 
     address owner;
-    Employee[] employees;
+    uint totalSalary;
+    mapping (address => Employee) employees;
 
     function Payroll() {
         owner = msg.sender;
     }
 
-    function _findEmployee(address employeeId) private returns (Employee employee, uint index) {
-        for (index = 0; index < employees.length; index++) {
-            employee = employees[index];
-            if (employee.id == employeeId) {
-                return;
-            }
-        }
+    function checkEmployee(address employeeId) returns (uint salary, uint lastPaidDay) {
+        Employee storage employee = employees[employeeId];
+        salary = employee.salary;
+        lastPaidDay = employee.lastPaidDay;
     }
-
+    
     function _partialPaid(Employee employee) private {
         uint payment = employee.salary *
             (now - employee.lastPaidDay) / payDuration;
-        require(payment <= this.balance);
+        assert(payment <= this.balance);
         employee.lastPaidDay = now;
         employee.id.transfer(payment);
-    }
-
-    function checkEmployee(address employeeId) returns (uint salary, uint lastPaidDay) {
-        var (employee, index) = _findEmployee(employeeId);
-        salary = employee.salary;
-        lastPaidDay = employee.lastPaidDay;
     }
 
     function updateEmployee(address employeeId, uint salary) {
         require(msg.sender == owner);
         require(salary > 0);
 
-        var (employee, index) = _findEmployee(employeeId);
+        Employee storage employee = employees[employeeId];
 
         if (employee.id == 0x0) {
-            addEmployee(employeeId, salary);
+            employees[employeeId] = Employee(employeeId, salary * 1 ether, now);
+            totalSalary += employees[employeeId].salary;
         } else {
             _partialPaid(employee);
+            totalSalary -= employee.salary;
             employee.salary = salary * 1 ether;
-
+            totalSalary += employee.salary;
         }
     }
 
-    function addEmployee(address employeeId, uint salary) {
-        require(salary > 0);
-        employees.push(Employee(employeeId, salary * 1 ether, now));
-    }
-
-    function removeEmployee(address employeeId) {
-        var (employee, index) = _findEmployee(employeeId);
+    function removeEmployee(address employeeId) returns(uint) {
+        Employee storage employee = employees[msg.sender];
         require(employee.id != 0x0);
 
         _partialPaid(employee);
-        delete employees[index];
+        totalSalary -= employees[employeeId].salary;
+        delete employees[employeeId];
     }
 
     function addFund() payable returns (uint) {
@@ -73,12 +63,6 @@ contract Payroll {
     }
 
     function calculateRunWay() returns (uint) {
-        uint totalSalary = 0;
-        for (uint index = 0; index < employees.length; index++) {
-            Employee memory employee = employees[index];
-            totalSalary += employee.salary;
-        }
-
         assert(totalSalary > 0);
         return this.balance / totalSalary;
     }
@@ -88,7 +72,7 @@ contract Payroll {
     }
 
     function getPaid() {
-        var (employee, index) = _findEmployee(msg.sender);
+        Employee storage employee = employees[msg.sender];
         require(employee.id != 0x0);
 
         uint nextPayDay = employee.lastPaidDay + payDuration;
