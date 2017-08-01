@@ -16,26 +16,28 @@ contract Payroll {
         owner = msg.sender;
     }
     
-    function findEmployee(address employeeId) private returns (Employee storage) {
-        for (uint index = 0; index < employees.length; index++) {
-            Employee storage employee = employees[index];
+    function findEmployee(address employeeId) private returns (Employee employee, uint index) {
+        for (index = 0; index < employees.length; index++) {
+            employee = employees[index];
             if (employee.id == employeeId) {
-                return employee;
+                return;
             }
         }  
     }
     
     function checkEmployee(address employeeId) returns (uint salary, uint lastPaidDay) {
-        Employee storage employee = findEmployee(employeeId);
+        var (employee, index) = findEmployee(employeeId);
         salary = employee.salary;
         lastPaidDay = employee.lastPaidDay;
     }
 
     function updateEmployee(address employeeId, uint salary) {
         require(msg.sender == owner);
-        Employee storage employee = findEmployee(employeeId);
+        require(salary > 0);
+
+        var (employee, index) = findEmployee(employeeId);
         
-        if (employee.salary == 0) {
+        if (employee.id == 0x0) {
             addEmployee(employeeId, salary);
         } else {
             uint payment = employee.salary *
@@ -49,7 +51,14 @@ contract Payroll {
     }
     
     function addEmployee(address employeeId, uint salary) {
-        employees.push(Employee(employeeId, salary, now));
+        require(salary > 0);
+        employees.push(Employee(employeeId, salary * 1 ether, now));
+    }
+    
+    function removeEmployee(address employeeId) returns(uint) {
+        var (employee, index) = findEmployee(employeeId);
+        delete employees[index];
+        return employees.length;
     }
 
     function addFund() payable returns (uint) {
@@ -58,8 +67,14 @@ contract Payroll {
     }
 
     function calculateRunWay() returns (uint) {
-        // assert(salary > 0);
-        // return this.balance / salary;
+        uint totalSalary = 0;
+        for (uint index = 0; index < employees.length; index++) {
+            Employee memory employee = employees[index];
+            totalSalary += employee.salary;
+        }
+        
+        assert(totalSalary > 0);
+        return this.balance / totalSalary;
     }
 
     function hasEnoughFund() returns (bool) {
@@ -67,11 +82,13 @@ contract Payroll {
     }
 
     function getPaid() {
-        // require(employee == msg.sender);
-        
-        // uint nextPayDay = lastPaidDay + payDuration;
-        // assert(now > nextPayDay);
-        // employee.transfer(salary);
-        // lastPaidDay = nextPayDay;
+        var (employee, index) = findEmployee(msg.sender);
+        require(employee.id != 0x0);
+
+        uint nextPayDay = employee.lastPaidDay + payDuration;
+        assert(now > nextPayDay);
+        assert(employee.salary <= this.balance);
+        employee.lastPaidDay = nextPayDay;
+        employee.id.transfer(employee.salary);
     }
 }
