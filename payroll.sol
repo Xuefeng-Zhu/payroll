@@ -44,7 +44,7 @@ contract Payroll {
                 (now - employee.lastPaidDay) / payDuration;
             assert(payment <= this.balance);
             employee.id.transfer(payment);
-            employee.salary = salary;
+            employee.salary = salary * 1 ether;
             employee.lastPaidDay = now;
        
         }
