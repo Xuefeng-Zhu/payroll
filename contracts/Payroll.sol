@@ -10,8 +10,14 @@ contract Payroll {
     }
 
     address owner;
-    uint totalSalary;
-    mapping (address => Employee) employees;
+    uint public totalSalary;
+    mapping (address => Employee) public employees;
+
+    event NewEmployee(
+        address id,
+        uint salary,
+        uint lastPaidDay
+    );
 
     function Payroll() {
         owner = msg.sender;
@@ -22,7 +28,7 @@ contract Payroll {
         salary = employee.salary;
         lastPaidDay = employee.lastPaidDay;
     }
-    
+
     function _partialPaid(Employee employee) private {
         uint payment = employee.salary *
             (now - employee.lastPaidDay) / payDuration;
@@ -37,7 +43,8 @@ contract Payroll {
 
         Employee storage employee = employees[employeeId];
 
-        if (employee.id == 0x0) {
+        NewEmployee(employeeId, salary, now);
+        if (employee.salary == 0) {
             employees[employeeId] = Employee(employeeId, salary * 1 ether, now);
             totalSalary += employees[employeeId].salary;
         } else {
@@ -62,9 +69,9 @@ contract Payroll {
         return this.balance;
     }
 
-    function calculateRunWay() returns (uint) {
+    function calculateRunWay() returns (uint round) {
         assert(totalSalary > 0);
-        return this.balance / totalSalary;
+        round = this.balance / totalSalary;
     }
 
     function hasEnoughFund() returns (bool) {
