@@ -4,11 +4,16 @@ export default function ArticleCard({
   accounts=[]
 }) {
   return (
-    <div>
-      <h2>Account List</h2>
-      <ul>
-        { accounts.map(account => (<li key={account}>{account}</li>))}
-      </ul>
+    <div className="pure-menu">
+        <span className="pure-menu-heading">Account List</span>
+
+        <ul className="pure-menu-list">
+          { accounts.map(account => (
+            <li className="pure-menu-item" key={account}>
+              <a href="#" className="pure-menu-link">{account}</a>
+            </li>))
+          }
+        </ul>
     </div>
   );
 }

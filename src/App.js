@@ -91,8 +91,10 @@ class App extends Component {
 
         <main className="container">
           <div className="pure-g">
-            <div className="pure-u-1-1">
+            <div className="pure-u-1-3">
               <Accounts accounts={accounts} />
+            </div>
+            <div className="pure-u-2-3">
               <Employer owner={accounts[0]} payroll={payroll} />
             </div>
           </div>
