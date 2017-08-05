@@ -56,7 +56,7 @@ contract Payroll {
     }
 
     function removeEmployee(address employeeId) returns(uint) {
-        Employee storage employee = employees[msg.sender];
+        Employee storage employee = employees[employeeId];
         require(employee.id != 0x0);
 
         _partialPaid(employee);

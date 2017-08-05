@@ -9,9 +9,9 @@ class Employer extends Component {
   }
 
   addFund = () => {
-    const { payroll, employer, web3 } = this.props;
+    const { payroll, owner, web3 } = this.props;
     payroll.addFund({
-      from: employer,
+      from: owner,
       value: web3.toWei(this.fundInput.value)
     }).then((result) => {
       alert(`success`);
@@ -19,19 +19,10 @@ class Employer extends Component {
   }
 
   updateEmployee = () => {
-    const { payroll, employer } = this.props;
+    const { payroll, owner } = this.props;
+    console.log(this.employeeInput.value, this.salaryInput.val)
     payroll.updateEmployee(this.employeeInput.value, parseInt(this.salaryInput.value), {
-      from: employer,
-      gas: 1000000
-    }).then((result) => {
-      alert(`success`);
-    });
-  }
-
-  removeEmployee = () => {
-    const { payroll, employer } = this.props;
-    payroll.removeEmployee(this.removeEmployeeInput.value, {
-      from: employer,
+      from: owner,
       gas: 1000000
     }).then((result) => {
       alert(`success`);
@@ -41,13 +32,14 @@ class Employer extends Component {
   render() {
     return (
       <div>
-        <h2>Employer</h2>
+        <h2>Employee</h2>
         <form className="pure-form pure-form-stacked">
           <fieldset>
             <legend>Add fund</legend>
 
             <label>fund</label>
             <input
+              id="fund"
               type="text"
               placeholder="fund"
               ref={(input) => { this.fundInput = input; }}/>
@@ -62,30 +54,19 @@ class Employer extends Component {
 
             <label>employee id</label>
             <input
+              id="employee"
               type="text"
               placeholder="employee"
               ref={(input) => { this.employeeInput = input; }}/>
 
             <label>salary</label>
             <input
+              id="salary"
               type="text"
               placeholder="salary"
               ref={(input) => { this.salaryInput = input; }}/>
 
             <button type="button" className="pure-button" onClick={this.updateEmployee}>Update</button>
-          </fieldset>
-        </form>
-
-        <form className="pure-form pure-form-stacked">
-          <fieldset>
-            <legend>Remove Employee</legend>
-
-            <label>employee id</label>
-            <input
-              type="text"
-              placeholder="employee"
-              ref={(input) => { this.removeEmployeeInput = input; }}/>
-            <button type="button" className="pure-button" onClick={this.removeEmployee}>Remove</button>
           </fieldset>
         </form>
       </div>

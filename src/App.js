@@ -4,6 +4,8 @@ import getWeb3 from './utils/getWeb3'
 
 import Accounts from './components/Accounts';
 import Employer from './components/Employer';
+import Employee from './components/Employee';
+import Common from './components/Common';
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -56,7 +58,8 @@ class App extends Component {
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
       this.setState({
-        accounts
+        accounts,
+        selectedAccount: accounts[0]
       });
       Payroll.deployed().then((instance) => {
         PayrollInstance = instance
@@ -76,8 +79,14 @@ class App extends Component {
     })
   }
 
+  onSelectAccount = (ev) => {
+    this.setState({
+      selectedAccount: ev.target.text
+    });
+  }
+
   render() {
-    const { accounts, payroll } = this.state;
+    const { selectedAccount, accounts, payroll, web3 } = this.state;
 
     if (!accounts) {
       return <div>Loading</div>;
@@ -86,16 +95,21 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-            <a href="#" className="pure-menu-heading pure-menu-link">Payroll</a>
+          <a href="#" className="pure-menu-heading pure-menu-link">Payroll</a>
         </nav>
 
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-3">
-              <Accounts accounts={accounts} />
+              <Accounts accounts={accounts} onSelectAccount={this.onSelectAccount}/>
             </div>
             <div className="pure-u-2-3">
-              <Employer owner={accounts[0]} payroll={payroll} />
+              {
+                selectedAccount === accounts[0] ?
+                <Employer employer={selectedAccount} payroll={payroll} web3={web3} /> :
+                <Employee owner={selectedAccount} payroll={payroll} web3={web3} />
+              }
+              <Common account={selectedAccount} payroll={payroll} />
             </div>
           </div>
         </main>
