@@ -13,8 +13,6 @@ class Employer extends Component {
     payroll.addFund({
       from: employer,
       value: web3.toWei(this.fundInput.value)
-    }).then((result) => {
-      alert(`success`);
     });
   }
 

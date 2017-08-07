@@ -66,15 +66,6 @@ class App extends Component {
         this.setState({
           payroll: instance
         });
-
-        instance.NewEmployee(function(error, result){
-            // result will contain various information
-            // including the argumets given to the Deposit
-            // call.
-            console.log(error)
-            if (!error)
-                console.log(result);
-        });
       })
     })
   }
@@ -109,7 +100,7 @@ class App extends Component {
                 <Employer employer={selectedAccount} payroll={payroll} web3={web3} /> :
                 <Employee employee={selectedAccount} payroll={payroll} web3={web3} />
               }
-              <Common account={selectedAccount} payroll={payroll} />
+              {payroll && <Common account={selectedAccount} payroll={payroll} web3={web3} />}
             </div>
           </div>
         </main>

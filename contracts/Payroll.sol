@@ -18,6 +18,9 @@ contract Payroll {
         uint salary,
         uint lastPaidDay
     );
+    event NewFund(
+        uint value
+    );
 
     function Payroll() {
         owner = msg.sender;
@@ -64,9 +67,9 @@ contract Payroll {
         delete employees[employeeId];
     }
 
-    function addFund() payable returns (uint) {
+    function addFund() payable {
         require(msg.value > 0);
-        return this.balance;
+        NewFund(this.balance);
     }
 
     function calculateRunWay() returns (uint round) {

@@ -5,7 +5,7 @@ export default function ArticleCard({
   onSelectAccount
 }) {
   return (
-    <div className="pure-menu">
+    <div className="pure-menu sidebar">
         <span className="pure-menu-heading">Account List</span>
 
         <ul className="pure-menu-list">
