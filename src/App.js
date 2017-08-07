@@ -107,7 +107,7 @@ class App extends Component {
               {
                 selectedAccount === accounts[0] ?
                 <Employer employer={selectedAccount} payroll={payroll} web3={web3} /> :
-                <Employee owner={selectedAccount} payroll={payroll} web3={web3} />
+                <Employee employee={selectedAccount} payroll={payroll} web3={web3} />
               }
               <Common account={selectedAccount} payroll={payroll} />
             </div>

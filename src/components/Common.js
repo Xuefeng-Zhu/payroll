@@ -4,8 +4,7 @@ class Employer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    };
+    this.state = {};
   }
 
   calculateRunWay = () => {
