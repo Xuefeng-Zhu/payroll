@@ -4,10 +4,8 @@ import getWeb3 from './utils/getWeb3'
 
 import { Layout, Menu, Spin, Alert } from 'antd';
 
-import Accounts from './components/Accounts';
 import Employer from './components/Employer';
 import Employee from './components/Employee';
-import Common from './components/Common';
 
 import 'antd/dist/antd.css';
 import './App.css';
@@ -61,8 +59,7 @@ class App extends Component {
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
       this.setState({
-        accounts,
-        selectedAccount: accounts[0]
+        account: accounts[0],
       });
       Payroll.deployed().then((instance) => {
         PayrollInstance = instance
@@ -86,7 +83,7 @@ class App extends Component {
   }
 
   renderContent = () => {
-    const { accounts, payroll, web3, mode } = this.state;
+    const { account, payroll, web3, mode } = this.state;
 
 
     if (!payroll) {
@@ -95,9 +92,9 @@ class App extends Component {
 
     switch(mode) {
       case 'employer':
-        return <Employer account={accounts[0]} payroll={payroll} web3={web3} />
+        return <Employer account={account} payroll={payroll} web3={web3} />
       case 'employee':
-        return <Employee account={accounts[1]} payroll={payroll} web3={web3} />
+        return <Employee account={account} payroll={payroll} web3={web3} />
       default:
         return <Alert message="请选一个模式" type="info" showIcon />
     }

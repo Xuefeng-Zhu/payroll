@@ -9,7 +9,7 @@ contract Payroll {
         uint lastPaidDay;
     }
 
-    address owner;
+    address public owner;
     uint totalSalary;
     uint employeeCount;
     address[] employeeList;

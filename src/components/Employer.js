@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Alert } from 'antd';
 
 import Fund from './Fund';
 import EmployeeList from './EmployeeList';
@@ -15,22 +15,15 @@ class Employer extends Component {
     };
   }
 
-  addFund = () => {
-    const { payroll, employer, web3 } = this.props;
-    payroll.addFund({
-      from: employer,
-      value: web3.toWei(this.fundInput.value)
-    });
-  }
-
-  updateEmployee = () => {
-    const { payroll, employer } = this.props;
-    payroll.updateEmployee(this.employeeInput.value, parseInt(this.salaryInput.value), {
-      from: employer,
-      gas: 1000000
+  componentDidMount() {
+    const { account, payroll } = this.props;
+    payroll.owner.call({
+      from: account
     }).then((result) => {
-      alert(`success`);
-    });
+      this.setState({
+        owner: result
+      });
+    })
   }
 
   onSelectTab = ({key}) => {
@@ -41,7 +34,11 @@ class Employer extends Component {
 
   renderContent = () => {
     const { account, payroll, web3 } = this.props;
-    const { mode } = this.state;
+    const { mode, owner } = this.state;
+
+    if (owner !== account) {
+      return <Alert message="你没有权限" type="error" showIcon />;
+    }
 
     switch(mode) {
       case 'fund':

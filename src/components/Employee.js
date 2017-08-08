@@ -17,7 +17,6 @@ class Employer extends Component {
     const { payroll, account, web3 } = this.props;
     payroll.employees.call(account, {
       from: account,
-      gas: 1000000
     }).then((result) => {
       console.log(result)
       this.setState({
@@ -31,7 +30,6 @@ class Employer extends Component {
     const { payroll, account } = this.props;
     payroll.getPaid({
       from: account,
-      gas: 1000000
     }).then((result) => {
       message.info(`You have been paid`);
     });
