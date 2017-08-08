@@ -10,23 +10,33 @@ contract Payroll {
     }
 
     address owner;
-    uint public totalSalary;
+    uint totalSalary;
+    uint employeeCount;
+    address[] employeeList;
     mapping (address => Employee) public employees;
 
     event NewEmployee(
-        address id,
-        uint salary,
-        uint lastPaidDay
+        address employee
+    );
+    event UpdateEmployee(
+        address employee
+    );
+    event RemoveEmployee(
+        address employee
     );
     event NewFund(
-        uint value
+        uint balance
+    );
+    event GetPaid(
+        address employee
     );
 
     function Payroll() {
         owner = msg.sender;
     }
 
-    function checkEmployee(address employeeId) returns (uint salary, uint lastPaidDay) {
+    function checkEmployee(uint index) returns (address employeeId, uint salary, uint lastPaidDay) {
+        employeeId = employeeList[index];
         Employee storage employee = employees[employeeId];
         salary = employee.salary;
         lastPaidDay = employee.lastPaidDay;
@@ -46,15 +56,18 @@ contract Payroll {
 
         Employee storage employee = employees[employeeId];
 
-        NewEmployee(employeeId, salary, now);
         if (employee.salary == 0) {
             employees[employeeId] = Employee(employeeId, salary * 1 ether, now);
             totalSalary += employees[employeeId].salary;
+            employeeCount += 1;
+            employeeList.push(employeeId);
+            NewEmployee(employeeId);
         } else {
             _partialPaid(employee);
             totalSalary -= employee.salary;
             employee.salary = salary * 1 ether;
             totalSalary += employee.salary;
+            UpdateEmployee(employeeId);
         }
     }
 
@@ -65,6 +78,8 @@ contract Payroll {
         _partialPaid(employee);
         totalSalary -= employees[employeeId].salary;
         delete employees[employeeId];
+        employeeCount -= 1;
+        RemoveEmployee(employeeId);
     }
 
     function addFund() payable {
@@ -90,5 +105,15 @@ contract Payroll {
         assert(employee.salary <= this.balance);
         employee.lastPaidDay = nextPayDay;
         employee.id.transfer(employee.salary);
+        GetPaid(employee.id);
+    }
+
+    function getInfo() returns (uint balance, uint runway, uint employeeC) {
+        balance = this.balance;
+        employeeC = employeeCount;
+
+        if (totalSalary > 0) {
+            runway = calculateRunWay();
+        }
     }
 }

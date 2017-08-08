@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
+import { Card, Col, Row } from 'antd';
 
-class Employer extends Component {
+class Common extends Component {
   constructor(props) {
     super(props);
 
@@ -9,40 +10,61 @@ class Employer extends Component {
 
   componentDidMount() {
     const { payroll, web3 } = this.props;
-    payroll.NewFund((error, result) => {
+    const updateInfo = (error, result) => {
       if (!error) {
-        console.log(result);
-        this.setState({
-          balance: web3.fromWei(result.args.value.toNumber())
-        });
-        this.calculateRunWay();
+        this.getInfo();
       }
-    });
-    this.calculateRunWay();
+    }
+
+    this.newFund = payroll.NewFund(updateInfo);
+    this.getPaid = payroll.GetPaid(updateInfo);
+    this.newEmployee = payroll.NewEmployee(updateInfo);
+    this.updateEmployee = payroll.UpdateEmployee(updateInfo);
+    this.removeEmployee = payroll.RemoveEmployee(updateInfo);
+
+    this.getInfo();
   }
 
-  calculateRunWay = () => {
-    const { payroll, account } = this.props;
-    payroll.calculateRunWay.call({
+  componentWillUnmount() {
+    this.newFund.stopWatching();
+    this.getPaid.stopWatching();
+    this.newEmployee.stopWatching();
+    this.updateEmployee.stopWatching();
+    this.removeEmployee.stopWatching();
+  }
+
+  getInfo = () => {
+    const { payroll, account, web3 } = this.props;
+    payroll.getInfo.call({
       from: account,
     }).then((result) => {
       this.setState({
-        runway: result.toNumber()
+        balance: web3.fromWei(result[0].toNumber()),
+        runway: result[1].toNumber(),
+        employeeCount: result[2].toNumber()
       })
     });
   }
 
   render() {
-    const { runway, balance } = this.state;
+    const { runway, balance, employeeCount } = this.state;
     return (
       <div>
-        <h2>Common Info</h2>
-        {balance && <p>Balance: {balance}</p>}
-        <p>Runway: {runway}</p>
-        <p>Has Enough Fund: {(runway > 0).toString()}</p>
+        <h2>通用信息</h2>
+        <Row gutter={16}>
+            <Col span={8}>
+              <Card title="合约金额">{balance}</Card>
+            </Col>
+            <Col span={8}>
+              <Card title="员工人数">{employeeCount}</Card>
+            </Col>
+            <Col span={8}>
+              <Card title="可支付次数">{runway}</Card>
+            </Col>
+          </Row>
       </div>
     );
   }
 }
 
-export default Employer
+export default Common

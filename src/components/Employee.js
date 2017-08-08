@@ -6,7 +6,7 @@ class Employer extends Component {
     this.state = {};
   }
 
-  componentWillReceiveProps() {
+  componentWillUpdate() {
     this.checkEmployee();
   }
 
