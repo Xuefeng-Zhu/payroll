@@ -79,56 +79,6 @@ class Employer extends Component {
           {this.renderContent()}
         </Content>
       </Layout>
-
-      // <div>
-      //   <h2>Employer</h2>
-      //   <form className="pure-form pure-form-stacked">
-      //     <fieldset>
-      //       <legend>Add fund</legend>
-
-      //       <label>fund</label>
-      //       <input
-      //         type="text"
-      //         placeholder="fund"
-      //         ref={(input) => { this.fundInput = input; }}/>
-
-      //       <button type="button" className="pure-button" onClick={this.addFund}>Add</button>
-      //     </fieldset>
-      //   </form>
-
-      //   <form className="pure-form pure-form-stacked">
-      //     <fieldset>
-      //       <legend>Update Employee</legend>
-
-      //       <label>employee id</label>
-      //       <input
-      //         type="text"
-      //         placeholder="employee"
-      //         ref={(input) => { this.employeeInput = input; }}/>
-
-      //       <label>salary</label>
-      //       <input
-      //         type="text"
-      //         placeholder="salary"
-      //         ref={(input) => { this.salaryInput = input; }}/>
-
-      //       <button type="button" className="pure-button" onClick={this.updateEmployee}>Update</button>
-      //     </fieldset>
-      //   </form>
-
-      //   <form className="pure-form pure-form-stacked">
-      //     <fieldset>
-      //       <legend>Remove Employee</legend>
-
-      //       <label>employee id</label>
-      //       <input
-      //         type="text"
-      //         placeholder="employee"
-      //         ref={(input) => { this.removeEmployeeInput = input; }}/>
-      //       <button type="button" className="pure-button" onClick={this.removeEmployee}>Remove</button>
-      //     </fieldset>
-      //   </form>
-      // </div>
     );
   }
 }

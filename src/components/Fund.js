@@ -26,7 +26,7 @@ class Fund extends Component {
       <div>
         <Common account={account} payroll={payroll} web3={web3} />
 
-        <Form layout="inline" onSubmit={this.handleSubmit} style={{marginTop: '10px'}}>
+        <Form layout="inline" onSubmit={this.handleSubmit}>
           <FormItem>
             <InputNumber
               min={1}

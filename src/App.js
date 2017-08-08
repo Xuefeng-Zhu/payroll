@@ -97,7 +97,7 @@ class App extends Component {
       case 'employer':
         return <Employer account={accounts[0]} payroll={payroll} web3={web3} />
       case 'employee':
-        return <Employee employee={accounts[1]} payroll={payroll} web3={web3} />
+        return <Employee account={accounts[1]} payroll={payroll} web3={web3} />
       default:
         return <Alert message="请选一个模式" type="info" showIcon />
     }

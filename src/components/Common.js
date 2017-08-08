@@ -52,16 +52,16 @@ class Common extends Component {
       <div>
         <h2>通用信息</h2>
         <Row gutter={16}>
-            <Col span={8}>
-              <Card title="合约金额">{balance}</Card>
-            </Col>
-            <Col span={8}>
-              <Card title="员工人数">{employeeCount}</Card>
-            </Col>
-            <Col span={8}>
-              <Card title="可支付次数">{runway}</Card>
-            </Col>
-          </Row>
+          <Col span={8}>
+            <Card title="合约金额">{balance}</Card>
+          </Col>
+          <Col span={8}>
+            <Card title="员工人数">{employeeCount}</Card>
+          </Col>
+          <Col span={8}>
+            <Card title="可支付次数">{runway}</Card>
+          </Col>
+        </Row>
       </div>
     );
   }
