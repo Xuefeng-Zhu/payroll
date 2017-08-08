@@ -12,7 +12,8 @@ class Fund extends Component {
     this.state = {};
   }
 
-  handleSubmit = () => {
+  handleSubmit = (ev) => {
+    ev.preventDefault();
     const { payroll, account, web3 } = this.props;
     payroll.addFund({
       from: account,

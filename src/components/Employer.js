@@ -33,16 +33,6 @@ class Employer extends Component {
     });
   }
 
-  removeEmployee = () => {
-    const { payroll, employer } = this.props;
-    payroll.removeEmployee(this.removeEmployeeInput.value, {
-      from: employer,
-      gas: 1000000
-    }).then((result) => {
-      alert(`success`);
-    });
-  }
-
   onSelectTab = ({key}) => {
     this.setState({
       mode: key

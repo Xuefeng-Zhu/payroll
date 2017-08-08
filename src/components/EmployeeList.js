@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import { Table, Button, Modal, Form, InputNumber, Input, message } from 'antd';
+import { Table, Button, Modal, Form, InputNumber, Input, message, Popconfirm } from 'antd';
+
+import EditableCell from './EditableCell';
 
 const FormItem = Form.Item;
 
@@ -15,6 +17,10 @@ const columns = [{
   title: '上次支付',
   dataIndex: 'lastPaidDay',
   key: 'lastPaidDay',
+}, {
+  title: '操作',
+  dataIndex: '',
+  key: 'action'
 }];
 
 class EmployeeList extends Component {
@@ -26,6 +32,19 @@ class EmployeeList extends Component {
       employees: [],
       showModal: false
     };
+
+    columns[1].render = (text, record) => (
+      <EditableCell
+        value={text}
+        onChange={ this.updateEmployee.bind(this, record.address) }
+      />
+    );
+
+    columns[3].render = (text, record) => (
+      <Popconfirm title="你确定删除吗?" onConfirm={() => this.removeEmployee(record.address)}>
+        <a href="#">Delete</a>
+      </Popconfirm>
+    );
   }
 
   componentDidMount() {
@@ -42,6 +61,7 @@ class EmployeeList extends Component {
 
       this.loadEmployees(employeeCount);
     });
+
   }
 
   loadEmployees(employeeCount) {
@@ -89,7 +109,43 @@ class EmployeeList extends Component {
         salary: '',
         showModal: false,
         employees: employees.concat([newEmployee])
-      })
+      });
+    });
+  }
+
+  updateEmployee = (address, salary) => {
+    const { payroll, account } = this.props;
+    const { employees } = this.state;
+    payroll.updateEmployee(address, salary, {
+      from: account,
+      gas: 1000000
+    }).then(() => {
+      this.setState({
+        employees: employees.map((employee) => {
+          if (employee.address === address) {
+            employee.salary = salary;
+          }
+
+          return employee;
+        })
+      });
+    }).catch(() => {
+      message.error('你没有足够的金额');
+    });
+  }
+
+  removeEmployee = (employeeId) => {
+    const { payroll, account } = this.props;
+    const { employees } = this.state;
+    payroll.removeEmployee(employeeId, {
+      from: account,
+      gas: 1000000
+    }).then((result) => {
+       this.setState({
+        employees: employees.filter(employee => employee.address !== employeeId)
+      });
+    }).catch(() => {
+      message.error('你没有足够的金额');
     });
   }
 
