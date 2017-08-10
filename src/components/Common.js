@@ -53,7 +53,7 @@ class Common extends Component {
         <h2>通用信息</h2>
         <Row gutter={16}>
           <Col span={8}>
-            <Card title="合约金额">{balance}</Card>
+            <Card title="合约金额">{balance} Ether</Card>
           </Col>
           <Col span={8}>
             <Card title="员工人数">{employeeCount}</Card>

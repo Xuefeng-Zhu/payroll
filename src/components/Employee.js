@@ -24,6 +24,12 @@ class Employer extends Component {
         lastPaidDate: new Date(result[2].toNumber() * 1000).toString()
       });
     });
+
+    web3.eth.getBalance(account, (err, result) => {
+      this.setState({
+        balance: web3.fromWei(result.toNumber())
+      });
+    });
   }
 
   getPaid = () => {
@@ -36,7 +42,7 @@ class Employer extends Component {
   }
 
   renderContent() {
-    const { salary, lastPaidDate } = this.state;
+    const { salary, lastPaidDate, balance } = this.state;
 
     if (!salary || salary === '0') {
       return   <Alert message="你不是员工" type="error" showIcon />;
@@ -50,6 +56,9 @@ class Employer extends Component {
           </Col>
           <Col span={8}>
             <Card title="上次支付">{lastPaidDate}</Card>
+          </Col>
+          <Col span={8}>
+            <Card title="帐号金额">{balance} Ether</Card>
           </Col>
         </Row>
 
