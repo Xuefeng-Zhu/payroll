@@ -1,84 +1,83 @@
-pragma solidity ^0.4.13;
+pragma solidity ^0.4.14;
 
 contract Payroll {
-    uint constant payDuration = 10 seconds;
-
     struct Employee {
         address id;
         uint salary;
-        uint lastPaidDay;
+        uint lastPayday;
     }
+    
+    uint constant payDuration = 10 seconds;
 
     address owner;
     uint totalSalary;
-    mapping (address => Employee) employees;
+    mapping(address => Employee) public employees;
 
     function Payroll() {
         owner = msg.sender;
     }
-
-    function checkEmployee(address employeeId) returns (uint salary, uint lastPaidDay) {
-        Employee storage employee = employees[employeeId];
-        salary = employee.salary;
-        lastPaidDay = employee.lastPaidDay;
+    
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+    
+    modifier employeeExit(address employeeId) {
+        var employee = employees[employeeId];
+        assert(employee.id != 0x0);
+        _;
     }
     
     function _partialPaid(Employee employee) private {
-        uint payment = employee.salary *
-            (now - employee.lastPaidDay) / payDuration;
-        assert(payment <= this.balance);
-        employee.lastPaidDay = now;
+        uint payment = employee.salary * (now - employee.lastPayday) / payDuration;
         employee.id.transfer(payment);
     }
 
-    function updateEmployee(address employeeId, uint salary) {
-        require(msg.sender == owner);
-        require(salary > 0);
+    function addEmployee(address employeeId, uint salary) onlyOwner {
+        var employee = employees[employeeId];
+        assert(employee.id == 0x0);
 
-        Employee storage employee = employees[employeeId];
-
-        if (employee.id == 0x0) {
-            employees[employeeId] = Employee(employeeId, salary * 1 ether, now);
-            totalSalary += employees[employeeId].salary;
-        } else {
-            _partialPaid(employee);
-            totalSalary -= employee.salary;
-            employee.salary = salary * 1 ether;
-            totalSalary += employee.salary;
-        }
+        employees[employeeId] = Employee(employeeId, salary * 1 ether, now);
+        totalSalary += employees[employeeId].salary;
     }
-
-    function removeEmployee(address employeeId) returns(uint) {
-        Employee storage employee = employees[msg.sender];
-        require(employee.id != 0x0);
+    
+    function removeEmployee(address employeeId) onlyOwner employeeExit(employeeId) {
+        var employee = employees[employeeId];
 
         _partialPaid(employee);
-        totalSalary -= employees[employeeId].salary;
+        totalSalary -= employee.salary;
         delete employees[employeeId];
     }
+    
+    function updateEmployee(address employeeId, uint salary) onlyOwner employeeExit(employeeId) {
+        var employee = employees[employeeId];
 
+        _partialPaid(employee);
+        totalSalary -= employee.salary;
+        employee.salary = salary * 1 ether;
+        employee.lastPayday = now;
+        totalSalary += employee.salary;
+    }
+    
     function addFund() payable returns (uint) {
-        require(msg.value > 0);
         return this.balance;
     }
-
-    function calculateRunWay() returns (uint) {
-        assert(totalSalary > 0);
+    
+    function calculateRunway() returns (uint) {
         return this.balance / totalSalary;
     }
-
+    
     function hasEnoughFund() returns (bool) {
-        return calculateRunWay() > 0;
+        return calculateRunway() > 0;
     }
+    
+    function getPaid() employeeExit(msg.sender) {
+        var employee = employees[msg.sender];
 
-    function getPaid() {
-        Employee storage employee = employees[msg.sender];
-        require(employee.id != 0x0);
+        uint nextPayday = employee.lastPayday + payDuration;
+        assert(nextPayday < now);
 
-        uint nextPayDay = employee.lastPaidDay + payDuration;
-        assert(now > nextPayDay);
-        assert(employee.salary <= this.balance);
-        employee.lastPaidDay = nextPayDay;
+        employee.lastPayday = nextPayday;
         employee.id.transfer(employee.salary);
     }
 }
