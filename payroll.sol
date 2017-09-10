@@ -1,6 +1,7 @@
 pragma solidity ^0.4.14;
 
 contract Payroll {
+    using SafeMath for uint;
     struct Employee {
         address id;
         uint salary;
@@ -29,7 +30,7 @@ contract Payroll {
     }
     
     function _partialPaid(Employee employee) private {
-        uint payment = employee.salary * (now - employee.lastPayday) / payDuration;
+        uint payment = employee.salary * (now.sub(employee.lastPayday)) / payDuration;
         employee.id.transfer(payment);
     }
 
