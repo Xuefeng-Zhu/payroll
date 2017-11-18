@@ -12,7 +12,7 @@ class Common extends Component {
     const { payroll, web3 } = this.props;
     const updateInfo = (error, result) => {
       if (!error) {
-        this.getInfo();
+        this.checkInfo();
       }
     }
 
@@ -22,7 +22,7 @@ class Common extends Component {
     this.updateEmployee = payroll.UpdateEmployee(updateInfo);
     this.removeEmployee = payroll.RemoveEmployee(updateInfo);
 
-    this.getInfo();
+    this.checkInfo();
   }
 
   componentWillUnmount() {
@@ -33,9 +33,9 @@ class Common extends Component {
     this.removeEmployee.stopWatching();
   }
 
-  getInfo = () => {
+  checkInfo = () => {
     const { payroll, account, web3 } = this.props;
-    payroll.getInfo.call({
+    payroll.checkInfo.call({
       from: account,
     }).then((result) => {
       this.setState({

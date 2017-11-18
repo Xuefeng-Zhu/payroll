@@ -18,7 +18,6 @@ class Employer extends Component {
     payroll.employees.call(account, {
       from: account,
     }).then((result) => {
-      console.log(result)
       this.setState({
         salary: web3.fromWei(result[1].toNumber()),
         lastPaidDate: new Date(result[2].toNumber() * 1000).toString()

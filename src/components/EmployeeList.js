@@ -49,7 +49,7 @@ class EmployeeList extends Component {
 
   componentDidMount() {
     const { payroll, account, web3 } = this.props;
-    payroll.getInfo.call({
+    payroll.checkInfo.call({
       from: account
     }).then((result) => {
       const employeeCount = result[2].toNumber();
@@ -93,7 +93,7 @@ class EmployeeList extends Component {
   addEmployee = () => {
     const { payroll, account } = this.props;
     const { address, salary, employees } = this.state;
-    payroll.updateEmployee(address, salary, {
+    payroll.addEmployee(address, salary, {
       from: account,
     }).then(() => {
       const newEmployee = {

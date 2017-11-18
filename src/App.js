@@ -70,12 +70,6 @@ class App extends Component {
     })
   }
 
-  onSelectAccount = (ev) => {
-    this.setState({
-      selectedAccount: ev.target.text
-    });
-  }
-
   onSelectTab = ({key}) => {
     this.setState({
       mode: key
@@ -84,7 +78,6 @@ class App extends Component {
 
   renderContent = () => {
     const { account, payroll, web3, mode } = this.state;
-
 
     if (!payroll) {
       return <Spin tip="Loading..." />;
@@ -101,8 +94,6 @@ class App extends Component {
   }
 
   render() {
-
-
     return (
       <Layout>
         <Header className="header">
