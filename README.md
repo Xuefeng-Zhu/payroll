@@ -1,6 +1,12 @@
 # payroll
 
-A payroll system developed with React and Solidty for Ethereum Blockchain platform. 
+A payroll system based on Ethereum.
+
+## Features
+
+* Add/Update/Delete employees
+* Add fund to the contract
+* Ensure employees get paid on time
 
 ## Get Started
 
@@ -11,3 +17,8 @@ A payroll system developed with React and Solidty for Ethereum Blockchain platfo
 1. Run `truffle compile` in the project directory
 1. `truffle migrate`
 1. `npm run start`
+
+## Why this is better than traditional system
+
+* Get rid of costly third party HR management
+* Make employees be able to get payment ontime
