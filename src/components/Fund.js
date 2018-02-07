@@ -40,7 +40,7 @@ class Fund extends Component {
               htmlType="submit"
               disabled={!this.state.fund}
             >
-              增加资金
+              Add fund
             </Button>
           </FormItem>
         </Form>

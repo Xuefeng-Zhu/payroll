@@ -1,6 +1,6 @@
 # payroll
 
-A payroll system based on Ethereum.
+It is common for the payment to be overdue or missed when working for small business and contract employment. A payroll system based on Ethereum can be a solution resolving this issue.
 
 ## Features
 

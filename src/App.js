@@ -89,7 +89,7 @@ class App extends Component {
       case 'employee':
         return <Employee account={account} payroll={payroll} web3={web3} />
       default:
-        return <Alert message="请选一个模式" type="info" showIcon />
+        return <Alert message="Please choose a mode" type="info" showIcon />
     }
   }
 
@@ -105,8 +105,8 @@ class App extends Component {
             style={{ lineHeight: '64px' }}
             onSelect={this.onSelectTab}
           >
-            <Menu.Item key="employer">雇主</Menu.Item>
-            <Menu.Item key="employee">雇员</Menu.Item>
+            <Menu.Item key="employer">Employer</Menu.Item>
+            <Menu.Item key="employee">Employee</Menu.Item>
           </Menu>
         </Header>
         <Content style={{ padding: '0 50px' }}>

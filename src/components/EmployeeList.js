@@ -6,19 +6,19 @@ import EditableCell from './EditableCell';
 const FormItem = Form.Item;
 
 const columns = [{
-  title: '地址',
+  title: 'Address',
   dataIndex: 'address',
   key: 'address',
 }, {
-  title: '薪水',
+  title: 'Salary',
   dataIndex: 'salary',
   key: 'salary',
 }, {
-  title: '上次支付',
+  title: 'Last paid day',
   dataIndex: 'lastPaidDay',
   key: 'lastPaidDay',
 }, {
-  title: '操作',
+  title: 'Actions',
   dataIndex: '',
   key: 'action'
 }];
@@ -41,7 +41,7 @@ class EmployeeList extends Component {
     );
 
     columns[3].render = (text, record) => (
-      <Popconfirm title="你确定删除吗?" onConfirm={() => this.removeEmployee(record.address)}>
+      <Popconfirm title="Are you sure to delete?" onConfirm={() => this.removeEmployee(record.address)}>
         <a href="#">Delete</a>
       </Popconfirm>
     );
@@ -128,7 +128,7 @@ class EmployeeList extends Component {
         })
       });
     }).catch(() => {
-      message.error('你没有足够的金额');
+      message.error('You do not have enough fund');
     });
   }
 
@@ -142,26 +142,26 @@ class EmployeeList extends Component {
         employees: employees.filter(employee => employee.address !== employeeId)
       });
     }).catch(() => {
-      message.error('你没有足够的金额');
+      message.error('You do not have enough fund');
     });
   }
 
   renderModal() {
       return (
       <Modal
-          title="增加员工"
+          title="Add employee"
           visible={this.state.showModal}
           onOk={this.addEmployee}
           onCancel={() => this.setState({showModal: false})}
       >
         <Form>
-          <FormItem label="地址">
+          <FormItem label="Address">
             <Input
               onChange={ev => this.setState({address: ev.target.value})}
             />
           </FormItem>
 
-          <FormItem label="薪水">
+          <FormItem label="Salary">
             <InputNumber
               min={1}
               onChange={salary => this.setState({salary})}
@@ -181,7 +181,7 @@ class EmployeeList extends Component {
           type="primary"
           onClick={() => this.setState({showModal: true})}
         >
-          增加员工
+          Add employee
         </Button>
 
         {this.renderModal()}

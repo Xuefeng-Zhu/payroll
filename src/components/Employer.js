@@ -37,7 +37,7 @@ class Employer extends Component {
     const { mode, owner } = this.state;
 
     if (owner !== account) {
-      return <Alert message="你没有权限" type="error" showIcon />;
+      return <Alert message="You do not have permission" type="error" showIcon />;
     }
 
     switch(mode) {
@@ -58,8 +58,8 @@ class Employer extends Component {
             style={{ height: '100%' }}
             onSelect={this.onSelectTab}
           >
-            <Menu.Item key="fund">合约信息</Menu.Item>
-            <Menu.Item key="employees">雇员信息</Menu.Item>
+            <Menu.Item key="fund">Contract info</Menu.Item>
+            <Menu.Item key="employees">Employee info</Menu.Item>
           </Menu>
         </Sider>
         <Content style={{ padding: '0 24px', minHeight: 280 }}>

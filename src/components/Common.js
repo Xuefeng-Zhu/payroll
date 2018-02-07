@@ -50,16 +50,16 @@ class Common extends Component {
     const { runway, balance, employeeCount } = this.state;
     return (
       <div>
-        <h2>通用信息</h2>
+        <h2>Common info</h2>
         <Row gutter={16}>
           <Col span={8}>
-            <Card title="合约金额">{balance} Ether</Card>
+            <Card title="Contract balance">{balance} Ether</Card>
           </Col>
           <Col span={8}>
-            <Card title="员工人数">{employeeCount}</Card>
+            <Card title="Employee count">{employeeCount}</Card>
           </Col>
           <Col span={8}>
-            <Card title="可支付次数">{runway}</Card>
+            <Card title="Runway">{runway}</Card>
           </Col>
         </Row>
       </div>
