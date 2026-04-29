@@ -3,10 +3,12 @@ import { Card, Col, Row, Layout, Alert, message, Button } from 'antd';
 
 import Common from './Common';
 
-class Employer extends Component {
+class Employee extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      loading: true
+    };
   }
 
   componentDidMount() {
@@ -19,14 +21,22 @@ class Employer extends Component {
       from: account,
     }).then((result) => {
       this.setState({
-        salary: web3.fromWei(result[1].toNumber()),
-        lastPaidDate: new Date(result[2].toNumber() * 1000).toString()
+        salary: web3.fromWei(result[1], 'ether').toString(10),
+        lastPaidDate: new Date(result[2].toNumber() * 1000).toString(),
+        loading: false
       });
+    }).catch(() => {
+      message.error('Unable to fetch employee details.');
+      this.setState({ loading: false });
     });
 
     web3.eth.getBalance(account, (err, result) => {
+      if (err) {
+        return;
+      }
+
       this.setState({
-        balance: web3.fromWei(result.toNumber())
+        balance: web3.fromWei(result, 'ether').toString(10)
       });
     });
   }
@@ -35,16 +45,23 @@ class Employer extends Component {
     const { payroll, account } = this.props;
     payroll.getPaid({
       from: account,
-    }).then((result) => {
-      message.info(`You have been paid`);
+    }).then(() => {
+      message.info('You have been paid');
+      this.checkEmployee();
+    }).catch(() => {
+      message.error('Unable to withdraw salary right now.');
     });
   }
 
   renderContent() {
-    const { salary, lastPaidDate, balance } = this.state;
+    const { salary, lastPaidDate, balance, loading } = this.state;
+
+    if (loading) {
+      return <Alert message="Loading employee info..." type="info" showIcon />;
+    }
 
     if (!salary || salary === '0') {
-      return   <Alert message="You are not employee" type="error" showIcon />;
+      return <Alert message="You are not employee" type="error" showIcon />;
     }
 
     return (
@@ -80,9 +97,9 @@ class Employer extends Component {
         <Common account={account} payroll={payroll} web3={web3} />
         <h2>Personal info</h2>
         {this.renderContent()}
-      </Layout >
+      </Layout>
     );
   }
 }
 
-export default Employer
+export default Employee

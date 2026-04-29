@@ -1,24 +1,76 @@
-# payroll
+# Payroll DApp
 
-It is common for the payment to be overdue or missed when working for small business and contract employment. A payroll system based on Ethereum can be a solution resolving this issue.
+A lightweight Ethereum payroll system for small teams and contractors.
 
 ## Features
 
-* Add/Update/Delete employees
-* Add fund to the contract
-* Ensure employees get paid on time
+- Add, update, and remove employees
+- Fund the payroll contract from an employer account
+- Let employees withdraw salary on payday
+- Show contract-level and account-level payroll metrics
 
-## Get Started
+## Project structure
 
-1. Install dependencies `npm install -g truffle ethereumjs-testrpc`
-1. Install [Metamask](https://metamask.io/)
-1. Run `testrpc`
-1. Add first account in testrpc to Metamask by importing private key
-1. Run `truffle compile` in the project directory
-1. `truffle migrate`
-1. `npm run start`
+- `contracts/`: Solidity contracts and payroll business rules
+- `migrations/`: Truffle deployment scripts
+- `src/`: React UI and web3 integration
+- `test/`: Solidity and JavaScript tests
 
-## Why this is better than traditional system
+## Local development (recommended)
 
-* Get rid of costly third party HR management
-* Make employees be able to get payment ontime
+### Prerequisites
+
+- Node.js 18+ (or the latest active LTS)
+- npm 9+
+- Ganache (GUI or CLI)
+- MetaMask
+
+### 1) Install dependencies
+
+```bash
+npm install
+```
+
+If your environment cannot access GitHub over SSH and `npm install` fails with `ssh://git@github.com/...`, force Git to use HTTPS:
+
+```bash
+git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+```
+
+Then run `npm install` again.
+
+### 2) Run a local chain
+
+Start Ganache and keep it running on `http://localhost:8545`.
+
+### 3) Deploy contracts
+
+```bash
+truffle compile
+truffle migrate --reset
+```
+
+### 4) Start the app
+
+```bash
+npm run start
+```
+
+## Best-practice notes
+
+- Use a dedicated wallet/account for local development.
+- Never import production private keys into a local test wallet.
+- Reset and re-migrate contracts after changing Solidity storage or constructor logic.
+- Keep UI values in ETH for display, but persist contract values in wei.
+
+## Testing
+
+```bash
+npm test -- --watch=false
+```
+
+For smart contract flows, also run Truffle tests:
+
+```bash
+truffle test
+```

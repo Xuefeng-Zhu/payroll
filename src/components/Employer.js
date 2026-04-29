@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Layout, Menu, Alert } from 'antd';
+import { Layout, Menu, Alert, message } from 'antd';
 
 import Fund from './Fund';
 import EmployeeList from './EmployeeList';
@@ -23,7 +23,9 @@ class Employer extends Component {
       this.setState({
         owner: result
       });
-    })
+    }).catch(() => {
+      message.error('Unable to verify employer permissions.');
+    });
   }
 
   onSelectTab = ({key}) => {
@@ -45,6 +47,8 @@ class Employer extends Component {
         return <Fund account={account} payroll={payroll} web3={web3} />
       case 'employees':
         return <EmployeeList account={account} payroll={payroll} web3={web3} />
+      default:
+        return <Alert message="Please choose an employer mode" type="info" showIcon />
     }
   }
 
