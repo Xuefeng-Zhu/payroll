@@ -1,36 +1,39 @@
 import React, { Component } from 'react'
-import { Card, Col, Row } from 'antd';
+import { Card, Col, Row, message } from 'antd';
 
 class Common extends Component {
   constructor(props) {
     super(props);
 
     this.state = {};
+    this.watchers = [];
   }
 
   componentDidMount() {
-    const { payroll, web3 } = this.props;
-    const updateInfo = (error, result) => {
+    const { payroll } = this.props;
+    const updateInfo = (error) => {
       if (!error) {
         this.checkInfo();
       }
     }
 
-    this.newFund = payroll.NewFund(updateInfo);
-    this.getPaid = payroll.GetPaid(updateInfo);
-    this.newEmployee = payroll.NewEmployee(updateInfo);
-    this.updateEmployee = payroll.UpdateEmployee(updateInfo);
-    this.removeEmployee = payroll.RemoveEmployee(updateInfo);
+    this.watchers = [
+      payroll.NewFund(updateInfo),
+      payroll.GetPaid(updateInfo),
+      payroll.NewEmployee(updateInfo),
+      payroll.UpdateEmployee(updateInfo),
+      payroll.RemoveEmployee(updateInfo)
+    ];
 
     this.checkInfo();
   }
 
   componentWillUnmount() {
-    this.newFund.stopWatching();
-    this.getPaid.stopWatching();
-    this.newEmployee.stopWatching();
-    this.updateEmployee.stopWatching();
-    this.removeEmployee.stopWatching();
+    this.watchers.forEach((watcher) => {
+      if (watcher && watcher.stopWatching) {
+        watcher.stopWatching();
+      }
+    });
   }
 
   checkInfo = () => {
@@ -39,10 +42,12 @@ class Common extends Component {
       from: account,
     }).then((result) => {
       this.setState({
-        balance: web3.fromWei(result[0].toNumber()),
+        balance: web3.fromWei(result[0], 'ether').toString(10),
         runway: result[1].toNumber(),
         employeeCount: result[2].toNumber()
       })
+    }).catch(() => {
+      message.error('Unable to refresh contract info.');
     });
   }
 

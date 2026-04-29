@@ -5,7 +5,7 @@ import EditableCell from './EditableCell';
 
 const FormItem = Form.Item;
 
-const columns = [{
+const baseColumns = [{
   title: 'Address',
   dataIndex: 'address',
   key: 'address',
@@ -30,38 +30,29 @@ class EmployeeList extends Component {
     this.state = {
       loading: true,
       employees: [],
-      showModal: false
+      showModal: false,
+      address: '',
+      salary: undefined
     };
-
-    columns[1].render = (text, record) => (
-      <EditableCell
-        value={text}
-        onChange={ this.updateEmployee.bind(this, record.address) }
-      />
-    );
-
-    columns[3].render = (text, record) => (
-      <Popconfirm title="Are you sure to delete?" onConfirm={() => this.removeEmployee(record.address)}>
-        <a href="#">Delete</a>
-      </Popconfirm>
-    );
   }
 
   componentDidMount() {
-    const { payroll, account, web3 } = this.props;
-    payroll.checkInfo.call({
-      from: account
-    }).then((result) => {
-      const employeeCount = result[2].toNumber();
+    const { payroll, account } = this.props;
+    payroll.checkInfo.call({ from: account })
+      .then((result) => {
+        const employeeCount = result[2].toNumber();
 
-      if (employeeCount === 0) {
-        this.setState({loading: false});
-        return;
-      }
+        if (employeeCount === 0) {
+          this.setState({ loading: false });
+          return;
+        }
 
-      this.loadEmployees(employeeCount);
-    });
-
+        this.loadEmployees(employeeCount);
+      })
+      .catch(() => {
+        message.error('Unable to load employees.');
+        this.setState({ loading: false });
+      });
   }
 
   loadEmployees(employeeCount) {
@@ -79,20 +70,25 @@ class EmployeeList extends Component {
         const employees = values.map(value => ({
           key: value[0],
           address: value[0],
-          salary: web3.fromWei(value[1].toNumber()),
+          salary: web3.fromWei(value[1], 'ether').toString(10),
           lastPaidDay: new Date(value[2].toNumber() * 1000).toString()
         }));
 
         this.setState({
           employees,
           loading: false
-        })
+        });
+      })
+      .catch(() => {
+        message.error('Unable to load employees.');
+        this.setState({ loading: false });
       });
   }
 
   addEmployee = () => {
     const { payroll, account } = this.props;
     const { address, salary, employees } = this.state;
+
     payroll.addEmployee(address, salary, {
       from: account,
     }).then(() => {
@@ -101,27 +97,33 @@ class EmployeeList extends Component {
         salary,
         key: address,
         lastPaidDay: new Date().toString()
-      }
+      };
 
       this.setState({
         address: '',
-        salary: '',
+        salary: undefined,
         showModal: false,
         employees: employees.concat([newEmployee])
       });
+    }).catch(() => {
+      message.error('Unable to add employee.');
     });
   }
 
   updateEmployee = (address, salary) => {
     const { payroll, account } = this.props;
     const { employees } = this.state;
+
     payroll.updateEmployee(address, salary, {
       from: account,
     }).then(() => {
       this.setState({
         employees: employees.map((employee) => {
           if (employee.address === address) {
-            employee.salary = salary;
+            return {
+              ...employee,
+              salary
+            };
           }
 
           return employee;
@@ -135,10 +137,11 @@ class EmployeeList extends Component {
   removeEmployee = (employeeId) => {
     const { payroll, account } = this.props;
     const { employees } = this.state;
+
     payroll.removeEmployee(employeeId, {
       from: account,
-    }).then((result) => {
-       this.setState({
+    }).then(() => {
+      this.setState({
         employees: employees.filter(employee => employee.address !== employeeId)
       });
     }).catch(() => {
@@ -147,39 +150,57 @@ class EmployeeList extends Component {
   }
 
   renderModal() {
-      return (
+    const { address, salary, showModal } = this.state;
+
+    return (
       <Modal
-          title="Add employee"
-          visible={this.state.showModal}
-          onOk={this.addEmployee}
-          onCancel={() => this.setState({showModal: false})}
+        title="Add employee"
+        visible={showModal}
+        onOk={this.addEmployee}
+        onCancel={() => this.setState({ showModal: false })}
       >
         <Form>
           <FormItem label="Address">
             <Input
-              onChange={ev => this.setState({address: ev.target.value})}
+              value={address}
+              onChange={ev => this.setState({ address: ev.target.value })}
             />
           </FormItem>
 
           <FormItem label="Salary">
             <InputNumber
               min={1}
-              onChange={salary => this.setState({salary})}
+              value={salary}
+              onChange={nextSalary => this.setState({ salary: nextSalary })}
             />
           </FormItem>
         </Form>
       </Modal>
     );
-
   }
 
   render() {
     const { loading, employees } = this.state;
+
+    const columns = baseColumns.map(column => ({ ...column }));
+    columns[1].render = (text, record) => (
+      <EditableCell
+        value={text}
+        onChange={this.updateEmployee.bind(this, record.address)}
+      />
+    );
+
+    columns[3].render = (text, record) => (
+      <Popconfirm title="Are you sure to delete?" onConfirm={() => this.removeEmployee(record.address)}>
+        <Button type="link">Delete</Button>
+      </Popconfirm>
+    );
+
     return (
       <div>
         <Button
           type="primary"
-          onClick={() => this.setState({showModal: true})}
+          onClick={() => this.setState({ showModal: true })}
         >
           Add employee
         </Button>

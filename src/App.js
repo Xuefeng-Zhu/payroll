@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PayrollContract from '../build/contracts/Payroll.json'
 import getWeb3 from './utils/getWeb3'
 
-import { Layout, Menu, Spin, Alert } from 'antd';
+import { Layout, Menu, Spin, Alert, message } from 'antd';
 
 import Employer from './components/Employer';
 import Employee from './components/Employee';
@@ -17,73 +17,79 @@ class App extends Component {
     super(props)
 
     this.state = {
-      storageValue: 0,
       web3: null,
-      mode: 'employer'
+      mode: 'employer',
+      loadingContract: true
     }
   }
 
-  componentWillMount() {
-    // Get network provider and web3 instance.
-    // See utils/getWeb3 for more info.
-
+  componentDidMount() {
     getWeb3
-    .then(results => {
-      this.setState({
-        web3: results.web3
+      .then(results => {
+        this.setState({ web3: results.web3 });
+        this.instantiateContract(results.web3);
       })
-
-      // Instantiate contract once web3 provided.
-      this.instantiateContract()
-    })
-    .catch(() => {
-      console.log('Error finding web3.')
-    })
+      .catch(() => {
+        message.error('Unable to initialize web3 provider.');
+        this.setState({ loadingContract: false });
+      })
   }
 
-  instantiateContract() {
-    /*
-     * SMART CONTRACT EXAMPLE
-     *
-     * Normally these functions would be called in the context of a
-     * state management library, but for convenience I've placed them here.
-     */
+  async instantiateContract(web3) {
+    if (window.ethereum && window.ethereum.request) {
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+      } catch (error) {
+        message.error('Wallet access is required to continue.');
+        this.setState({ loadingContract: false });
+        return;
+      }
+    }
 
     const contract = require('truffle-contract')
     const Payroll = contract(PayrollContract)
-    Payroll.setProvider(this.state.web3.currentProvider)
+    Payroll.setProvider(web3.currentProvider)
 
-    // Declaring this for later so we can chain functions on Payroll.
-    var PayrollInstance
+    web3.eth.getAccounts((error, accounts) => {
+      if (error || !accounts || !accounts.length) {
+        message.error('No Ethereum account is available.');
+        this.setState({ loadingContract: false });
+        return;
+      }
 
-    // Get accounts.
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      this.setState({
-        account: accounts[0],
-      });
+      const account = accounts[0];
+      this.setState({ account });
+
       Payroll.deployed().then((instance) => {
-        PayrollInstance = instance
         this.setState({
-          payroll: instance
+          payroll: instance,
+          loadingContract: false
         });
-      })
+      }).catch(() => {
+        message.error('Unable to connect to deployed Payroll contract.');
+        this.setState({ loadingContract: false });
+      });
     })
   }
 
-  onSelectTab = ({key}) => {
+  onSelectTab = ({ key }) => {
     this.setState({
       mode: key
     });
   }
 
   renderContent = () => {
-    const { account, payroll, web3, mode } = this.state;
+    const { account, payroll, web3, mode, loadingContract } = this.state;
 
-    if (!payroll) {
+    if (loadingContract) {
       return <Spin tip="Loading..." />;
     }
 
-    switch(mode) {
+    if (!payroll) {
+      return <Alert message="Payroll contract is unavailable." type="error" showIcon />;
+    }
+
+    switch (mode) {
       case 'employer':
         return <Employer account={account} payroll={payroll} web3={web3} />
       case 'employee':
