@@ -35,7 +35,17 @@ class App extends Component {
       })
   }
 
-  instantiateContract(web3) {
+  async instantiateContract(web3) {
+    if (window.ethereum && window.ethereum.request) {
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+      } catch (error) {
+        message.error('Wallet access is required to continue.');
+        this.setState({ loadingContract: false });
+        return;
+      }
+    }
+
     const contract = require('truffle-contract')
     const Payroll = contract(PayrollContract)
     Payroll.setProvider(web3.currentProvider)

@@ -30,7 +30,12 @@ const getWeb3 = new Promise((resolve, reject) => {
     return;
   }
 
-  window.addEventListener('load', initializeWeb3);
+  const onLoad = () => {
+    window.removeEventListener('load', onLoad);
+    initializeWeb3();
+  };
+
+  window.addEventListener('load', onLoad);
 });
 
 export default getWeb3
